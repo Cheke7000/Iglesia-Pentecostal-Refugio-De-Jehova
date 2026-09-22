@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peticiones de oración — Iglesia Pentecostal Refugio de Jehová</title>
+<meta name="theme-color" content="#0E2A47">
+<link rel="stylesheet" href="styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <img src="images/logo.jpg" alt="Logo Iglesia Pentecostal Refugio de Jehová">
+      <span class="brand-text">
+        <strong>Refugio de Jehová</strong>
+        Iglesia Pentecostal
+      </span>
+    </a>
+
+    <button class="menu-toggle" aria-label="Abrir menú">&#9776;</button>
+
+    <nav class="main-nav">
+      <a href="index.html">Inicio</a>
+      <a href="index.html#horarios">Horarios</a>
+      <a href="index.html#en-vivo">En vivo</a>
+      <div class="has-dropdown">
+        <button type="button">Nosotros <span class="caret">&#9662;</span></button>
+        <div class="dropdown">
+          <a href="index.html#mision-vision">Misión y visión</a>
+          <a href="index.html#directiva">Directiva</a>
+          <a href="index.html#pastores">Pastores</a>
+        </div>
+      </div>
+      <a href="filiales.html">Filiales</a>
+      <a href="peticiones.html">Peticiones</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="wrap">
+    <h1>Peticiones de oración</h1>
+    <p>Comparte lo que está en tu corazón. Nuestro equipo pastoral orará por cada petición recibida.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="request-wrap">
+
+      <!-- Formulario -->
+      <form id="prayer-form">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre o nombres" required>
+          </div>
+          <div class="form-field">
+            <label for="apellido">Apellido <span class="hint">(opcional)</span></label>
+            <input type="text" id="apellido" name="apellido" placeholder="Tu apellido o apellidos">
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="peticion">Petición</label>
+          <textarea id="peticion" name="peticion" placeholder="Escribe aquí tu petición de oración..." required></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">Enviar petición</button>
+
+        <div id="form-status" class="form-status"></div>
+      </form>
+
+      <!-- Mensaje de confirmación (oculto hasta enviar) -->
+      <div id="confirm-box" class="confirm-box" style="display:none;">
+        <div class="icon">&#10003;</div>
+        <h3>Tu petición ha sido enviada</h3>
+        <p>Gracias por confiarnos lo que está en tu corazón. Estaremos orando por ella.</p>
+        <button type="button" class="btn btn-primary" id="send-another">Enviar otra petición</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <h4>Iglesia Pentecostal Refugio de Jehová</h4>
+        <p style="color:rgba(255,255,255,0.7); font-size:0.92rem; max-width:40ch;">Un refugio de la Palabra de Dios para tu vida y tu familia.</p>
+      </div>
+      <div>
+        <h4>Enlaces</h4>
+        <a href="index.html#horarios">Horarios</a>
+        <a href="index.html#en-vivo">En vivo</a>
+        <a href="filiales.html">Filiales</a>
+        <a href="peticiones.html">Peticiones</a>
+      </div>
+      <div>
+        <h4>Síguenos</h4>
+        <a href="https://www.facebook.com/profile.php?id=100064378015175" target="_blank" rel="noopener">Facebook</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © <span id="year"></span> Iglesia Pentecostal Refugio de Jehová
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+
+/*
+  ============================================================
+  CONFIGURACIÓN DEL ENVÍO DE PETICIONES
+  ============================================================
+  1. Crea una cuenta gratuita en https://formspree.io
+  2. Crea un nuevo formulario y copia la URL que te dan
+     (se ve algo así: https://formspree.io/f/abcdwxyz)
+  3. Reemplaza el texto "PEGA_AQUI_TU_URL_DE_FORMSPREE" de abajo
+     por esa URL, entre las comillas.
+  ============================================================
+*/
+const FORMSPREE_URL = "https://formspree.io/f/xgaendvb";
+
+const form = document.getElementById("prayer-form");
+const confirmBox = document.getElementById("confirm-box");
+const statusEl = document.getElementById("form-status");
+const submitBtn = document.getElementById("submit-btn");
+
+form.addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  if (FORMSPREE_URL.indexOf("PEGA_AQUI") !== -1) {
+    statusEl.textContent = "Nota para el administrador: aún falta configurar la URL de Formspree en este archivo (peticiones.html) para que los envíos lleguen a tu correo.";
+    statusEl.classList.add("error");
+    return;
+  }
+
+  statusEl.classList.remove("error");
+  statusEl.textContent = "Enviando...";
+  submitBtn.disabled = true;
+
+  const data = new FormData(form);
+
+  try {
+    const response = await fetch(FORMSPREE_URL, {
+      method: "POST",
+      body: data,
+      headers: { "Accept": "application/json" }
+    });
+
+    if (response.ok) {
+      form.style.display = "none";
+      confirmBox.style.display = "block";
+    } else {
+      statusEl.textContent = "No se pudo enviar la petición. Por favor intenta de nuevo en unos minutos.";
+      statusEl.classList.add("error");
+      submitBtn.disabled = false;
+    }
+  } catch (err) {
+    statusEl.textContent = "No se pudo enviar la petición. Revisa tu conexión e intenta de nuevo.";
+    statusEl.classList.add("error");
+    submitBtn.disabled = false;
+  }
+});
+
+document.getElementById("send-another").addEventListener("click", function () {
+  form.reset();
+  form.style.display = "block";
+  confirmBox.style.display = "none";
+  statusEl.textContent = "";
+  submitBtn.disabled = false;
+});
+</script>
+</body>
+</html>
